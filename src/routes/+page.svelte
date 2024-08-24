@@ -140,6 +140,9 @@
 					HN Surprise
 				</button>
 			</div>
+			{#if error}
+				<p class="text-red-400 mt-4 text-center">{error}</p>
+			{/if}
 		{:else if state === 'loading'}
 			<div in:fade={{ duration: 300 }} class="text-center">
 				<div class="loader"></div>
