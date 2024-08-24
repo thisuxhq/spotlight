@@ -28,6 +28,9 @@
 		try {
 			const response = await fetch(`/api/random/${source}`);
 			if (!response.ok) {
+				if (response.status === 500) {
+					throw new Error(`Server error. The ${source} API might be unavailable.`);
+				}
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
 			const data = await response.json();
