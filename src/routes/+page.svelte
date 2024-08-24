@@ -102,125 +102,129 @@
 	<meta name="twitter:image" content="https://your-spotlight-url.com/twitter-image.jpg" />
 </svelte:head>
 
-<div class="min-h-screen bg-black text-gray-300 flex flex-col items-center justify-center p-4">
-	<div class="w-full max-w-2xl mx-auto">
-		<h1
-			in:scale={{ duration: 600, easing: cubicOut }}
-			class="text-4xl font-bold mb-4 text-center gradient-text"
-		>
-			Hey, wanna find something cool?
-		</h1>
-		<p in:fade={{ delay: 300, duration: 400 }} class="text-xl text-gray-400 mb-10 text-center">
-			Hit one of these buttons to find something cool!
-		</p>
+<div class="min-h-screen bg-black text-gray-300 flex flex-col">
+	<main class="flex-grow flex flex-col items-center justify-center p-4">
+		<div class="w-full max-w-2xl mx-auto">
+			<h1
+				in:scale={{ duration: 600, easing: cubicOut }}
+				class="text-4xl font-bold mb-4 text-center gradient-text"
+			>
+				Hey, wanna find something cool?
+			</h1>
+			<p in:fade={{ delay: 300, duration: 400 }} class="text-xl text-gray-400 mb-10 text-center">
+				Hit one of these buttons to find something cool!
+			</p>
 
-		{#if state === 'idle'}
-			<div
-				in:fade={{ duration: 300 }}
-				class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4"
-			>
-				<button
-					on:click={() => {
-						pulse();
-						fetchRandomPost('reddit');
-					}}
-					class="big-button bg-red-600 hover:bg-red-700"
-					style="transform: scale({$buttonScale})"
-				>
-					Reddit Surprise
-				</button>
-				<button
-					on:click={() => {
-						pulse();
-						fetchRandomPost('hackernews');
-					}}
-					class="big-button bg-orange-600 hover:bg-orange-700"
-					style="transform: scale({$buttonScale})"
-				>
-					HN Surprise
-				</button>
-			</div>
-			{#if error}
-				<p class="text-red-400 mt-4 text-center">{error}</p>
-			{/if}
-		{:else if state === 'loading'}
-			<div in:fade={{ duration: 300 }} class="text-center">
-				<div class="loader"></div>
-				<p class="text-lg text-gray-400 mt-4">Hang tight, fishing for gold...</p>
-			</div>
-		{:else if state === 'fetched'}
-			<div
-				in:fly={{ y: 20, duration: 400 }}
-				class="text-center bg-gray-950 rounded-3xl border border-gray-900 p-6 shadow-lg"
-			>
-				<p class="text-xl text-gray-300 mb-4">Ta-da! Check this out:</p>
-				{#if error}
-					<p class="text-red-400 mb-4">{error}</p>
-				{:else}
-					<p class="text-lg text-gray-400 mb-2">{title}</p>
-					<a href={url} class="text-blue-400 hover:text-blue-300 break-all mb-6 block">{url}</a>
-				{/if}
+			{#if state === 'idle'}
 				<div
-					class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-6"
+					in:fade={{ duration: 300 }}
+					class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4"
 				>
 					<button
 						on:click={() => {
 							pulse();
-							redirectToUrl();
+							fetchRandomPost('reddit');
 						}}
-						class="big-button bg-green-600 hover:bg-green-700"
+						class="big-button bg-red-600 hover:bg-red-700"
 						style="transform: scale({$buttonScale})"
 					>
-						Let's Go!
+						Reddit Surprise
 					</button>
 					<button
 						on:click={() => {
 							pulse();
-							fetchRandomPost(source);
+							fetchRandomPost('hackernews');
 						}}
-						class="big-button bg-gray-700 hover:bg-gray-600 text-gray-200"
+						class="big-button bg-orange-600 hover:bg-orange-700"
 						style="transform: scale({$buttonScale})"
 					>
-						One More!
+						HN Surprise
 					</button>
 				</div>
-			</div>
-		{:else if state === 'redirecting'}
-			<div in:fly={{ y: 20, duration: 300 }} class="text-center">
-				<p class="text-xl text-gray-300 mb-2">Buckle up, we're taking off!</p>
-				<a href={url} class="text-blue-400 hover:text-blue-300 break-all text-lg">{url}</a>
-			</div>
-		{/if}
-
-		{#if history.length > 0}
-			<div class="mt-16" in:fade={{ duration: 400, delay: 200 }}>
-				<h2 class="text-2xl font-semibold text-gray-300 mb-6">Your Cool Finds</h2>
-				<div class="grid gap-4 md:grid-cols-2">
-					{#each history as item, i}
-						<a
-							href={item.url}
-							class="bg-gray-950 p-4 border border-gray-900 rounded-2xl hover:shadow-md transition-all duration-300 transform hover:scale-105"
-							in:fly={{ y: 20, duration: 300, delay: i * 50 }}
-						>
-							<p class="text-sm text-gray-500 mb-2">
-								{item.source === 'reddit' ? 'Reddit' : 'Hacker News'}
-							</p>
-							<p class="text-blue-400 hover:text-blue-300 break-all">{item.title || item.url}</p>
-						</a>
-					{/each}
+			{:else if state === 'loading'}
+				<div in:fade={{ duration: 300 }} class="text-center">
+					<div class="loader"></div>
+					<p class="text-lg text-gray-400 mt-4">Hang tight, fishing for gold...</p>
 				</div>
-			</div>
-		{/if}
-	</div>
+			{:else if state === 'fetched'}
+				<div
+					in:fly={{ y: 20, duration: 400 }}
+					class="text-center bg-gray-950 rounded-3xl border border-gray-900 p-6 shadow-lg"
+				>
+					<p class="text-xl text-gray-300 mb-4">Ta-da! Check this out:</p>
+					{#if error}
+						<p class="text-red-400 mb-4">{error}</p>
+					{:else}
+						<p class="text-lg text-gray-400 mb-2">{title}</p>
+						<a href={url} class="text-blue-400 hover:text-blue-300 break-all mb-6 block">{url}</a>
+					{/if}
+					<div
+						class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-6"
+					>
+						<button
+							on:click={() => {
+								pulse();
+								redirectToUrl();
+							}}
+							class="big-button bg-green-600 hover:bg-green-700"
+							style="transform: scale({$buttonScale})"
+						>
+							Let's Go!
+						</button>
+						<button
+							on:click={() => {
+								pulse();
+								fetchRandomPost(source);
+							}}
+							class="big-button bg-gray-700 hover:bg-gray-600 text-gray-200"
+							style="transform: scale({$buttonScale})"
+						>
+							One More!
+						</button>
+					</div>
+				</div>
+			{:else if state === 'redirecting'}
+				<div in:fly={{ y: 20, duration: 300 }} class="text-center">
+					<p class="text-xl text-gray-300 mb-2">Buckle up, we're taking off!</p>
+					<a href={url} class="text-blue-400 hover:text-blue-300 break-all text-lg">{url}</a>
+				</div>
+			{/if}
 
-	<footer in:fade={{ duration: 300, delay: 500 }} class="mt-16 text-center text-gray-500 text-sm">
-		<p>
-			Cooked up with love by
-			<a href="https://thisux.com" class="text-gray-400 hover:text-gray-300">
-				ThisUX Design Studio.
-			</a>
-			Enjoy!
-		</p>
+			{#if history.length > 0}
+				<div class="mt-16" in:fade={{ duration: 400, delay: 200 }}>
+					<h2 class="text-2xl font-semibold text-gray-300 mb-6">Your Cool Finds</h2>
+					<div class="grid gap-4 md:grid-cols-2">
+						{#each history as item, i}
+							<a
+								href={item.url}
+								class="bg-gray-950 p-4 border border-gray-900 rounded-2xl hover:shadow-md transition-all duration-300 transform hover:scale-105"
+								in:fly={{ y: 20, duration: 300, delay: i * 50 }}
+							>
+								<p class="text-sm text-gray-500 mb-2">
+									{item.source === 'reddit' ? 'Reddit' : 'Hacker News'}
+								</p>
+								<p class="text-blue-400 hover:text-blue-300 break-all">{item.title || item.url}</p>
+							</a>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</div>
+	</main>
+
+	<footer
+		in:fade={{ duration: 300, delay: 500 }}
+		class="mt-auto py-4 text-center text-gray-500 text-sm border-t border-gray-800"
+	>
+		<div class="w-full max-w-2xl mx-auto">
+			<p>
+				Cooked up with love by
+				<a href="https://thisux.com" class="text-gray-400 hover:text-gray-300">
+					ThisUX Design Studio.
+				</a>
+				Enjoy!
+			</p>
+		</div>
 	</footer>
 </div>
 
@@ -235,10 +239,6 @@
 
 	.loader {
 		@apply w-12 h-12 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mx-auto;
-	}
-
-	footer {
-		@apply w-full max-w-2xl mx-auto py-4 border-t border-gray-800;
 	}
 
 	.gradient-text {
