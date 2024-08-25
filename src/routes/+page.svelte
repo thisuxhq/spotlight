@@ -54,17 +54,6 @@
 		}
 	}
 
-	function redirectToUrl() {
-		if (url) {
-			state = 'redirecting';
-			setTimeout(() => {
-				if (url) {
-					window.location.href = url;
-				}
-			}, 2000);
-		}
-	}
-
 	let buttonScale = spring(1);
 	function pulse() {
 		buttonScale.set(1.05);
@@ -174,7 +163,11 @@
 						<button
 							on:click={() => {
 								pulse();
-								fetchRandomPost(source);
+								if (source === 'reddit') {
+									fetchRandomPost('reddit');
+								} else {
+									fetchRandomPost('hackernews');
+								}
 							}}
 							class="big-button bg-gray-700 hover:bg-gray-600 text-gray-200"
 							style="transform: scale({$buttonScale})"
