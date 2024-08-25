@@ -200,6 +200,7 @@
 							<a
 								href={item.url}
 								class="bg-gray-950 p-4 border-[0.10px] border-gray-900 rounded-2xl hover:shadow-md transition-all duration-300 transform hover:scale-105"
+								target="_blank"
 								in:fly={{ y: 20, duration: 300, delay: i * 50 }}
 							>
 								<p class="text-sm text-gray-500 mb-2">
