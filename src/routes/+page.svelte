@@ -187,7 +187,7 @@
 				</div>
 			{:else if state === 'redirecting'}
 				<div in:fly={{ y: 20, duration: 300 }} class="text-center">
-					<p class="text-xl text-gray-300 mb-2">Buckle up, we're taking off!</p>
+					<p class="text-xl text-gray-300 mb-2">Here we go, off to the link!</p>
 					<a href={url} class="text-blue-400 hover:text-blue-300 break-all text-lg">{url}</a>
 				</div>
 			{/if}
