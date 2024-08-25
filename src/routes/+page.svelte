@@ -58,7 +58,9 @@
 		if (url) {
 			state = 'redirecting';
 			setTimeout(() => {
-				window.location.href = url;
+				if (url) {
+					window.location.href = url;
+				}
 			}, 2000);
 		}
 	}
