@@ -163,16 +163,14 @@
 					<div
 						class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-6"
 					>
-						<button
-							on:click={() => {
-								pulse();
-								redirectToUrl();
-							}}
-							class="big-button bg-green-600 hover:bg-green-700"
+						<a
+							href={url}
+							target="_blank"
+							class="big-button bg-green-600 hover:bg-green-700 inline-block text-center"
 							style="transform: scale({$buttonScale})"
 						>
 							Let's Go!
-						</button>
+						</a>
 						<button
 							on:click={() => {
 								pulse();
@@ -188,7 +186,9 @@
 			{:else if state === 'redirecting'}
 				<div in:fly={{ y: 20, duration: 300 }} class="text-center">
 					<p class="text-xl text-gray-300 mb-2">Here we go, off to the link!</p>
-					<a href={url} class="text-blue-400 hover:text-blue-300 break-all text-lg">{url}</a>
+					<a href={url} class="text-blue-400 hover:text-blue-300 break-all text-lg" target="_blank">
+						{url}
+					</a>
 				</div>
 			{/if}
 
