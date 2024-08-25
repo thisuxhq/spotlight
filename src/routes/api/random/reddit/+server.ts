@@ -1,21 +1,24 @@
 import type { RequestHandler } from '../$types';
+// import { CLOUDFLARE_WORKER_URL } from '$env/static/private';
 
 export const GET: RequestHandler = async () => {
-	const response = await fetch('https://www.reddit.com/r/InternetIsBeautiful/random.json');
-	const data = await response.json();
+	try {
+		const response = await fetch('https://reddit.sanju.sh/');
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		const data = await response.json();
 
-	const post = data[0].data.children[0].data;
-
-	return new Response(
-		JSON.stringify({
-			title: post.title,
-			url: post.url_overridden_by_dest,
-			permalink: `https://www.reddit.com${post.permalink}`
-		}),
-		{
+		return new Response(JSON.stringify(data), {
 			headers: {
 				'content-type': 'application/json'
 			}
-		}
-	);
+		});
+	} catch (error) {
+		console.error('Error fetching from Reddit:', error);
+		return new Response(JSON.stringify({ error: 'Failed to fetch from Reddit' }), {
+			status: 500,
+			headers: { 'content-type': 'application/json' }
+		});
+	}
 };
