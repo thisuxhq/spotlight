@@ -5,7 +5,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3005:3005'
-    working_dir: /app
-    command: ['bun', 'run', 'start']
     environment:
       - NODE_ENV=production
