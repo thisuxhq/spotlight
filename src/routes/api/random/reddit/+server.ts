@@ -1,9 +1,9 @@
 import type { RequestHandler } from '../$types';
-// import { CLOUDFLARE_WORKER_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const GET: RequestHandler = async () => {
 	try {
-		const response = await fetch('https://reddit.sanju.sh/');
+		const response = await fetch(env.CLOUDFLARE_WORKER_URL);
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
