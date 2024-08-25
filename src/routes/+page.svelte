@@ -91,23 +91,23 @@
 		content="Click a button, find random, interesting content from Reddit and Hacker News with just one click."
 	/>
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://your-spotlight-url.com" />
-	<meta property="og:image" content="https://your-spotlight-url.com/og-image.jpg" />
+	<meta property="og:url" content="https://spotlight.thisux.com" />
+	<meta property="og:image" content="https://spotlight.thisux.com/og-image.jpg" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Spotlight - Discover Cool Internet Gems" />
 	<meta
 		name="twitter:description"
 		content="Click a button, find something awesome on the internet. Curated content from Reddit and Hacker News."
 	/>
-	<meta name="twitter:image" content="https://your-spotlight-url.com/twitter-image.jpg" />
+	<meta name="twitter:image" content="https://spotlight.thisux.com/twitter-image.jpg" />
 </svelte:head>
 
-<div class="min-h-screen bg-black text-gray-300 flex flex-col">
+<div class="min-h-screen bg-gray-950 text-gray-300 flex flex-col">
 	<main class="flex-grow flex flex-col items-center justify-center p-4">
 		<div class="w-full max-w-2xl mx-auto">
 			<h1
 				in:scale={{ duration: 600, easing: cubicOut }}
-				class="text-4xl font-bold mb-4 text-center gradient-text"
+				class="text-4xl font-medium tracking-tight mb-4 text-center gradient-text"
 			>
 				Hey, wanna find something cool?
 			</h1>
@@ -174,7 +174,7 @@
 						<button
 							on:click={() => {
 								pulse();
-								if (source) fetchRandomPost(source);
+								fetchRandomPost(source);
 							}}
 							class="big-button bg-gray-700 hover:bg-gray-600 text-gray-200"
 							style="transform: scale({$buttonScale})"
@@ -197,7 +197,7 @@
 						{#each history as item, i}
 							<a
 								href={item.url}
-								class="bg-gray-950 p-4 border border-gray-900 rounded-2xl hover:shadow-md transition-all duration-300 transform hover:scale-105"
+								class="bg-gray-950 p-4 border-[0.10px] border-gray-900 rounded-2xl hover:shadow-md transition-all duration-300 transform hover:scale-105"
 								in:fly={{ y: 20, duration: 300, delay: i * 50 }}
 							>
 								<p class="text-sm text-gray-500 mb-2">
