@@ -1,38 +1,63 @@
-# create-svelte
+# Spotlight
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+Spotlight is a web application designed to help users discover interesting content from across the internet. It provides a simple interface to fetch random, curated links from Reddit's r/InternetIsBeautiful and Hacker News.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- Random content retrieval from Reddit and Hacker News
+- User-friendly interface with one-click discovery
+- Responsive design for both desktop and mobile devices
+- Local storage of previously discovered links
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Getting Started
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+To run Spotlight locally:
 
-## Developing
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   bun install
+   ```
+3. Start the development server:
+   ```bash
+   bun run dev
+   ```
+4. Open your browser and navigate to `http://localhost:5173`
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Building for Production
 
-```bash
-npm run dev
+To create a production build:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+1. Run the build command:
+   ```bash
+   bun run build
+   ```
+2. Preview the production build:
+   ```bash
+   bun run preview
+   ```
 
-## Building
+## Technology Stack
 
-To create a production version of your app:
+- Svelte: Front-end framework
+- TypeScript: Programming language
+- Tailwind CSS: Styling
 
-```bash
-npm run build
-```
+## API Endpoints
 
-You can preview the production build with `npm run preview`.
+- `/api/random/reddit`: Fetches a random post from r/InternetIsBeautiful
+- `/api/random/hackernews`: Fetches a random post from Hacker News top stories
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Contributing
+
+Contributions are welcome. Please open an issue first to discuss what you would like to change or add.
+
+## License
+
+[MIT License](LICENSE)
+
+## Acknowledgements
+
+Developed by ThisUX Design Studio. We aim to bring a touch of serendipity to your internet browsing experience.
+
+For any questions or suggestions, please open an issue on GitHub.
