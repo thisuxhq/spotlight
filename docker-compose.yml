@@ -1,9 +1,0 @@
-services:
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - '3005:3005'
-    environment:
-      - NODE_ENV=production
