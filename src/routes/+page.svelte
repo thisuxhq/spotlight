@@ -102,7 +102,7 @@
 	<meta name="twitter:image" content="https://spotlight.thisux.com/twitter-image.jpg" />
 </svelte:head>
 
-<div class="min-h-screen bg-gray-950 text-gray-300 flex flex-col">
+<div class="min-h-screen bg-black text-gray-300 flex flex-col">
 	<main class="flex-grow flex flex-col items-center justify-center p-4">
 		<div class="w-full max-w-2xl mx-auto">
 			<h1
