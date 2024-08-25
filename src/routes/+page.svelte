@@ -79,7 +79,7 @@
 	<title>Spotlight - Discover Cool Internet Gems</title>
 	<meta
 		name="description"
-		content="Uncover fascinating corners of the internet with Spotlight. Get random, curated content from Reddit and Hacker News at the click of a button."
+		content="Find random, interesting content from Reddit and Hacker News with just one click."
 	/>
 	<meta
 		name="keywords"
@@ -88,7 +88,7 @@
 	<meta property="og:title" content="Spotlight - Discover Cool Internet Gems" />
 	<meta
 		property="og:description"
-		content="Click a button, find something awesome on the internet. Curated content from Reddit and Hacker News."
+		content="Click a button, find random, interesting content from Reddit and Hacker News with just one click."
 	/>
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://your-spotlight-url.com" />
@@ -174,7 +174,7 @@
 						<button
 							on:click={() => {
 								pulse();
-								fetchRandomPost(source);
+								if (source) fetchRandomPost(source);
 							}}
 							class="big-button bg-gray-700 hover:bg-gray-600 text-gray-200"
 							style="transform: scale({$buttonScale})"
