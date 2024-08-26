@@ -55,6 +55,7 @@
 	}
 
 	let buttonScale = spring(1);
+
 	function pulse() {
 		buttonScale.set(1.05);
 		setTimeout(() => buttonScale.set(1), 150);
@@ -173,6 +174,16 @@
 							style="transform: scale({$buttonScale})"
 						>
 							One More!
+						</button>
+						<button
+							on:click={() => {
+								pulse();
+								state = 'idle';
+							}}
+							class="big-button bg-blue-600 hover:bg-blue-700 text-gray-200"
+							style="transform: scale({$buttonScale})"
+						>
+							Start Over
 						</button>
 					</div>
 				</div>
