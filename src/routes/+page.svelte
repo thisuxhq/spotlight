@@ -13,7 +13,7 @@
 	let preferences = [
 		{ name: 'InternetIsBeautiful', enabled: true },
 		{ name: 'todayilearned', enabled: true },
-		{ name: 'YouShouldKnow', enabled: true },
+		{ name: 'Documentaries', enabled: true },
 		{ name: 'science', enabled: true },
 		{ name: 'technology', enabled: true },
 		{ name: 'worldnews', enabled: true },
@@ -22,7 +22,6 @@
 		{ name: 'dataisbeautiful', enabled: true },
 		{ name: 'gadgets', enabled: true },
 		{ name: 'listentothis', enabled: true },
-		{ name: 'DIY', enabled: true },
 		{name: 'DepthHub', enabled: true},
 		{name: 'AskHistorians', enabled: true},
 	];
@@ -109,10 +108,24 @@
 		setTimeout(() => buttonScale.set(1), 150);
 	}
 
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'r' || event.key === 'R') {
+			pulse();
+			fetchRandomPost('reddit');
+		} else if (event.key === 'h' || event.key === 'H') {
+			pulse();
+			fetchRandomPost('hackernews');
+		}
+	}
+
 	onMount(() => {
 		loadPreferences();
 		const { history: storedHistory } = getStoredData();
 		history = storedHistory;
+		window.addEventListener('keydown', handleKeydown);
+		return () => {
+			window.removeEventListener('keydown', handleKeydown);
+		};
 	});
 </script>
 
@@ -177,7 +190,7 @@
 						class="big-button bg-red-600 hover:bg-red-700"
 						style="transform: scale({$buttonScale})"
 					>
-						Reddit Surprise
+						Reddit Surprise <kbd class="ml-2 px-2 py-1 text-sm bg-red-700 rounded">R</kbd>
 					</button>
 					<button
 						on:click={() => {
@@ -187,7 +200,7 @@
 						class="big-button bg-orange-600 hover:bg-orange-700"
 						style="transform: scale({$buttonScale})"
 					>
-						HN Surprise
+						HN Surprise <kbd class="ml-2 px-2 py-1 text-sm bg-orange-700 rounded">H</kbd>
 					</button>
 				</div>
 			{:else if state === 'loading'}
