@@ -43,6 +43,11 @@
 		localStorage.setItem('subredditPreferences', JSON.stringify(preferences));
 	}
 
+	function toggleAllPreferences(checked: boolean) {
+		preferences = preferences.map(pref => ({ ...pref, enabled: checked }));
+		savePreferences();
+	}
+
 	function getStoredData() {
 		const storedHistory = JSON.parse(localStorage.getItem('urlHistory') || '[]');
 		return { history: storedHistory };
@@ -327,6 +332,16 @@
         </svg>
     </button>
     <h2 class="text-2xl font-semibold mb-6 text-gray-300 gradient-text">Subreddit Preferences</h2>
+    <div class="flex items-center mb-4">
+        <input
+            type="checkbox"
+            id="selectAll"
+            checked={preferences.every(pref => pref.enabled)}
+            on:change={(e) => toggleAllPreferences(e.target.checked)}
+            class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+        />
+        <label for="selectAll" class="ml-2 text-gray-300 hover:text-white transition-colors duration-300">Select All</label>
+    </div>
     {#each preferences as pref}
         <div class="flex items-center mb-4">
             <input
