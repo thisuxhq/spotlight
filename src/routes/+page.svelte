@@ -10,6 +10,36 @@
 	let source: 'reddit' | 'hackernews' | null = null;
 	let error: string | null = null;
 	let history: Array<{ url: string; title: string; source: 'reddit' | 'hackernews' }> = [];
+	let preferences = [
+		{ name: 'InternetIsBeautiful', enabled: true },
+		{ name: 'todayilearned', enabled: true },
+		{ name: 'YouShouldKnow', enabled: true },
+		{ name: 'science', enabled: true },
+		{ name: 'technology', enabled: true },
+		{ name: 'worldnews', enabled: true },
+		{ name: 'UpliftingNews', enabled: true },
+		{ name: 'space', enabled: true },
+		{ name: 'dataisbeautiful', enabled: true },
+		{ name: 'gadgets', enabled: true },
+		{ name: 'listentothis', enabled: true }
+	];
+
+	let isSidebarOpen = false;
+
+	function toggleSidebar() {
+		isSidebarOpen = !isSidebarOpen;
+	}
+
+	function loadPreferences() {
+		const storedPreferences = localStorage.getItem('subredditPreferences');
+		if (storedPreferences) {
+			preferences = JSON.parse(storedPreferences);
+		}
+	}
+
+	function savePreferences() {
+		localStorage.setItem('subredditPreferences', JSON.stringify(preferences));
+	}
 
 	function getStoredData() {
 		const storedHistory = JSON.parse(localStorage.getItem('urlHistory') || '[]');
@@ -24,9 +54,24 @@
 
 	async function fetchRandomPost(source: 'reddit' | 'hackernews') {
 		state = 'loading';
-		error = null; // Reset error at the start of the function
+		error = null;
 		try {
-			const response = await fetch(`/api/random/${source}`);
+			let response;
+			if (source === 'reddit') {
+				const enabledPreferences = preferences.filter(pref => pref.enabled).map(pref => pref.name);
+				if (enabledPreferences.length === 0) {
+					throw new Error('Please select at least one subreddit preference');
+				}
+				response = await fetch(`/api/random/${source}`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ preferences: enabledPreferences })
+				});
+			} else {
+				response = await fetch(`/api/random/${source}`);
+			}
 			if (!response.ok) {
 				if (response.status === 500) {
 					throw new Error(`Server error. The ${source} API might be unavailable.`);
@@ -62,6 +107,7 @@
 	}
 
 	onMount(() => {
+		loadPreferences();
 		const { history: storedHistory } = getStoredData();
 		history = storedHistory;
 	});
@@ -95,7 +141,15 @@
 </svelte:head>
 
 <div class="min-h-screen bg-black text-gray-300 flex flex-col">
-	<main class="flex-grow flex flex-col items-center justify-center p-4">
+	<main class="flex-grow flex flex-col items-center justify-center p-4 relative">
+		<button
+			on:click={toggleSidebar}
+			class="absolute top-4 right-4 z-10 text-gray-400 hover:text-white transition-colors duration-300"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+			</svg>
+		</button>
 		<div class="w-full max-w-2xl mx-auto">
 			<h1
 				in:scale={{ duration: 600, easing: cubicOut }}
@@ -235,9 +289,35 @@
 	</footer>
 </div>
 
+<div
+    class="fixed right-0 top-0 h-full w-64 bg-gray-950 p-6 overflow-y-auto transition-transform duration-300 ease-in-out transform {isSidebarOpen ? 'translate-x-0' : 'translate-x-full'} z-50"
+>
+    <button
+        on:click={toggleSidebar}
+        class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-300"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+    <h2 class="text-2xl font-semibold mb-6 text-gray-300 gradient-text">Subreddit Preferences</h2>
+    {#each preferences as pref}
+        <div class="flex items-center mb-4">
+            <input
+                type="checkbox"
+                id={pref.name}
+                bind:checked={pref.enabled}
+                on:change={savePreferences}
+                class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+            />
+            <label for={pref.name} class="ml-2 text-gray-300 hover:text-white transition-colors duration-300">{pref.name}</label>
+        </div>
+    {/each}
+</div>
+
 <style>
 	:global(body) {
-		@apply bg-black text-gray-300 font-sans;
+		@apply bg-black text-gray-300 font-sans overflow-x-hidden;
 	}
 
 	.big-button {

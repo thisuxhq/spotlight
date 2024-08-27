@@ -1,9 +1,15 @@
-import type { RequestHandler } from '../$types';
 import { env } from '$env/dynamic/private';
 
-export const GET: RequestHandler = async () => {
+export const POST = async ({ request }) => {
 	try {
-		const response = await fetch(env.CLOUDFLARE_WORKER_URL);
+		const { preferences } = await request.json();
+		if (!preferences || preferences.length === 0) {
+			throw new Error('No subreddit preferences provided');
+		}
+
+		const randomSubreddit = preferences[Math.floor(Math.random() * preferences.length)];
+		const response = await fetch(`${env.CLOUDFLARE_WORKER_URL}?source=reddit&subreddit=${randomSubreddit}`);
+
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
