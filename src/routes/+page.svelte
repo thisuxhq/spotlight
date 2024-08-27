@@ -21,7 +21,10 @@
 		{ name: 'space', enabled: true },
 		{ name: 'dataisbeautiful', enabled: true },
 		{ name: 'gadgets', enabled: true },
-		{ name: 'listentothis', enabled: true }
+		{ name: 'listentothis', enabled: true },
+		{ name: 'DIY', enabled: true },
+		{name: 'DepthHub', enabled: true},
+		{name: 'AskHistorians', enabled: true},
 	];
 
 	let isSidebarOpen = false;
