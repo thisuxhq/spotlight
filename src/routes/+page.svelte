@@ -85,6 +85,7 @@
 			if (data.url) {
 				url = data.url;
 				title = data.title || null;
+				source = source; // Set the source here
 				setStoredData({
 					url: data.url,
 					title: data.title || '',
@@ -102,31 +103,33 @@
 	}
 
 	let buttonScale = spring(1);
+	let buttonColor = spring(0);
 
-	function pulse() {
-		buttonScale.set(1.05);
-		setTimeout(() => buttonScale.set(1), 150);
+	function pulse(color: 'emerald' | 'indigo' | 'rose') {
+		buttonScale.set(1.1);
+		buttonColor.set(1);
+		setTimeout(() => {
+			buttonScale.set(1);
+			buttonColor.set(0);
+		}, 300);
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'r' || event.key === 'R') {
-			pulse();
+			pulse('indigo');
 			fetchRandomPost('reddit');
 		} else if (event.key === 'h' || event.key === 'H') {
-			pulse();
+			pulse('indigo');
 			fetchRandomPost('hackernews');
-		} else if (event.key === 'g' || event.key === 'G') {
+		} else if (event.key === 'v' || event.key === 'V') {
 			if (url) window.open(url, '_blank');
-		} else if (event.key === 's' || event.key === 'S') {
-			pulse();
+			pulse('emerald');
+		} else if (event.key === 'n' || event.key === 'N') {
+			pulse('rose');
 			state = 'idle';
-		} else if (event.key === 'o' || event.key === 'O') {
-			pulse();
-			if (source === 'reddit') {
-				fetchRandomPost('reddit');
-			} else {
-				fetchRandomPost('hackernews');
-			}
+		} else if (event.key === 'e' || event.key === 'E') {
+			pulse('indigo');
+			fetchRandomPost(source || 'reddit');
 		}
 	}
 
@@ -196,7 +199,7 @@
 				>
 					<button
 						on:click={() => {
-							pulse();
+							pulse('indigo');
 							fetchRandomPost('reddit');
 						}}
 						class="big-button bg-red-600 hover:bg-red-700"
@@ -206,7 +209,7 @@
 					</button>
 					<button
 						on:click={() => {
-							pulse();
+							pulse('indigo');
 							fetchRandomPost('hackernews');
 						}}
 						class="big-button bg-orange-600 hover:bg-orange-700"
@@ -232,40 +235,35 @@
 						<p class="text-lg text-gray-400 mb-2">{title}</p>
 						<a href={url} class="text-blue-400 hover:text-blue-300 break-all mb-6 block">{url}</a>
 					{/if}
-					<div
-						class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-6"
-					>
+					<div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
 						<a
 							href={url}
 							target="_blank"
-							class="big-button bg-green-600 hover:bg-green-700 inline-block text-center"
+							class="big-button bg-emerald-600 hover:bg-emerald-700 inline-block text-center transform transition-all duration-300 hover:scale-105 hover:rotate-1"
 							style="transform: scale({$buttonScale})"
+							on:click={() => pulse('emerald')}
 						>
-							Let's Go! <kbd class="ml-2 px-2 py-1 text-sm bg-green-700 rounded">G</kbd>
+							Visit Site <kbd class="ml-2 px-2 py-1 text-sm bg-emerald-700 rounded shadow-inner">V</kbd>
 						</a>
 						<button
 							on:click={() => {
-								pulse();
-								if (source === 'reddit') {
-									fetchRandomPost('reddit');
-								} else {
-									fetchRandomPost('hackernews');
-								}
+								pulse('indigo');
+								fetchRandomPost(source || 'reddit');
 							}}
-							class="big-button bg-gray-700 hover:bg-gray-600 text-gray-200"
+							class="big-button bg-indigo-600 hover:bg-indigo-700 text-gray-200 transform transition-all duration-300 hover:scale-105 hover:-rotate-1"
 							style="transform: scale({$buttonScale})"
 						>
-							One More! <kbd class="ml-2 px-2 py-1 text-sm bg-gray-800 rounded">O</kbd>
+							Next Link <kbd class="ml-2 px-2 py-1 text-sm bg-indigo-700 rounded shadow-inner">E</kbd>
 						</button>
 						<button
 							on:click={() => {
-								pulse();
+								pulse('rose');
 								state = 'idle';
 							}}
-							class="big-button bg-blue-600 hover:bg-blue-700 text-gray-200"
+							class="big-button bg-rose-600 hover:bg-rose-700 text-gray-200 transform transition-all duration-300 hover:scale-105 hover:rotate-1"
 							style="transform: scale({$buttonScale})"
 						>
-							Start Over <kbd class="ml-2 px-2 py-1 text-sm bg-blue-700 rounded">S</kbd>
+							Start Over <kbd class="ml-2 px-2 py-1 text-sm bg-rose-700 rounded shadow-inner">N</kbd>
 						</button>
 					</div>
 				</div>
@@ -344,36 +342,52 @@
 </div>
 
 <style>
-	:global(body) {
-		@apply bg-black text-gray-300 font-sans overflow-x-hidden;
-	}
+    :global(body) {
+        @apply bg-black text-gray-300 font-sans overflow-x-hidden;
+    }
 
-	.big-button {
-		@apply px-8 py-4 rounded-full text-lg font-medium text-white transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-50;
-	}
+    .big-button {
+        @apply px-8 py-4 rounded-full text-lg font-medium text-white transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-50 shadow-lg;
+    }
 
-	.loader {
-		@apply w-12 h-12 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mx-auto;
-	}
+    .loader {
+        @apply w-12 h-12 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mx-auto;
+    }
 
-	.gradient-text {
-		background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
-		animation: gradient 10s ease infinite;
-		background-size: 300% 300%;
-	}
+    .gradient-text {
+        background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradient 10s ease infinite;
+        background-size: 300% 300%;
+    }
 
-	@keyframes gradient {
-		0% {
-			background-position: 0% 50%;
-		}
-		50% {
-			background-position: 100% 50%;
-		}
-		100% {
-			background-position: 0% 50%;
-		}
-	}
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .big-button {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .big-button::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300%;
+        height: 300%;
+        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 0.5s ease-out;
+    }
+
+    .big-button:active::after {
+        transform: translate(-50%, -50%) scale(1);
+        transition: transform 0s;
+    }
 </style>
