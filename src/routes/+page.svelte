@@ -115,6 +115,18 @@
 		} else if (event.key === 'h' || event.key === 'H') {
 			pulse();
 			fetchRandomPost('hackernews');
+		} else if (event.key === 'g' || event.key === 'G') {
+			if (url) window.open(url, '_blank');
+		} else if (event.key === 's' || event.key === 'S') {
+			pulse();
+			state = 'idle';
+		} else if (event.key === 'o' || event.key === 'O') {
+			pulse();
+			if (source === 'reddit') {
+				fetchRandomPost('reddit');
+			} else {
+				fetchRandomPost('hackernews');
+			}
 		}
 	}
 
@@ -229,7 +241,7 @@
 							class="big-button bg-green-600 hover:bg-green-700 inline-block text-center"
 							style="transform: scale({$buttonScale})"
 						>
-							Let's Go!
+							Let's Go! <kbd class="ml-2 px-2 py-1 text-sm bg-green-700 rounded">G</kbd>
 						</a>
 						<button
 							on:click={() => {
@@ -243,7 +255,7 @@
 							class="big-button bg-gray-700 hover:bg-gray-600 text-gray-200"
 							style="transform: scale({$buttonScale})"
 						>
-							One More!
+							One More! <kbd class="ml-2 px-2 py-1 text-sm bg-gray-800 rounded">O</kbd>
 						</button>
 						<button
 							on:click={() => {
@@ -253,7 +265,7 @@
 							class="big-button bg-blue-600 hover:bg-blue-700 text-gray-200"
 							style="transform: scale({$buttonScale})"
 						>
-							Start Over
+							Start Over <kbd class="ml-2 px-2 py-1 text-sm bg-blue-700 rounded">S</kbd>
 						</button>
 					</div>
 				</div>

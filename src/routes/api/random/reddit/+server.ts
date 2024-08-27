@@ -4,11 +4,19 @@ export const POST = async ({ request }) => {
 	try {
 		const { preferences } = await request.json();
 		if (!preferences || preferences.length === 0) {
-			throw new Error('No subreddit preferences provided');
+			return new Response(JSON.stringify({ error: 'No subreddit preferences provided' }), {
+				status: 400,
+				headers: { 'content-type': 'application/json' }
+			});
 		}
 
-		const randomSubreddit = preferences[Math.floor(Math.random() * preferences.length)];
-		const response = await fetch(`${env.CLOUDFLARE_WORKER_URL}?source=reddit&subreddit=${randomSubreddit}`);
+		const response = await fetch(`${env.CLOUDFLARE_WORKER_URL}?source=reddit`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ preferences })
+		});
 
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
