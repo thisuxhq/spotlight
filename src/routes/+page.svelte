@@ -7,9 +7,13 @@
 	let state: 'idle' | 'loading' | 'fetched' | 'redirecting' = 'idle';
 	let url: string | null = null;
 	let title: string | null = null;
-	let source: 'reddit' | 'hackernews' | null = null;
+	let source: 'reddit' | 'hackernews' | 'wikipedia' | null = null; // Updated to persist source
 	let error: string | null = null;
-	let history: Array<{ url: string; title: string; source: 'reddit' | 'hackernews' }> = [];
+	let history: Array<{
+		url: string;
+		title: string;
+		source: 'reddit' | 'hackernews' | 'wikipedia';
+	}> = [];
 	let preferences = [
 		{ name: 'InternetIsBeautiful', enabled: true },
 		{ name: 'todayilearned', enabled: true },
@@ -22,8 +26,8 @@
 		{ name: 'dataisbeautiful', enabled: true },
 		{ name: 'gadgets', enabled: true },
 		{ name: 'listentothis', enabled: true },
-		{name: 'DepthHub', enabled: true},
-		{name: 'AskHistorians', enabled: true},
+		{ name: 'DepthHub', enabled: true },
+		{ name: 'AskHistorians', enabled: true }
 	];
 
 	let isSidebarOpen = false;
@@ -44,7 +48,7 @@
 	}
 
 	function toggleAllPreferences(checked: boolean) {
-		preferences = preferences.map(pref => ({ ...pref, enabled: checked }));
+		preferences = preferences.map((pref) => ({ ...pref, enabled: checked }));
 		savePreferences();
 	}
 
@@ -53,19 +57,26 @@
 		return { history: storedHistory };
 	}
 
-	function setStoredData(newItem: { url: string; title: string; source: 'reddit' | 'hackernews' }) {
+	function setStoredData(newItem: {
+		url: string;
+		title: string;
+		source: 'reddit' | 'hackernews' | 'wikipedia';
+	}) {
 		const updatedHistory = [newItem, ...history.filter((item) => item.url !== newItem.url)];
 		localStorage.setItem('urlHistory', JSON.stringify(updatedHistory));
 		history = updatedHistory;
 	}
 
-	async function fetchRandomPost(source: 'reddit' | 'hackernews') {
+	async function fetchRandomPost(selectedSource: 'reddit' | 'hackernews' | 'wikipedia') {
 		state = 'loading';
 		error = null;
+		source = selectedSource; // Set the source to the selected source
 		try {
 			let response;
 			if (source === 'reddit') {
-				const enabledPreferences = preferences.filter(pref => pref.enabled).map(pref => pref.name);
+				const enabledPreferences = preferences
+					.filter((pref) => pref.enabled)
+					.map((pref) => pref.name);
 				if (enabledPreferences.length === 0) {
 					throw new Error('Please select at least one subreddit preference');
 				}
@@ -79,26 +90,46 @@
 			} else {
 				response = await fetch(`/api/random/${source}`);
 			}
+
 			if (!response.ok) {
-				if (response.status === 500) {
-					throw new Error(`Server error. The ${source} API might be unavailable.`);
-				}
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
+
 			const data = await response.json();
 			console.log('API response:', data);
-			if (data.url) {
-				url = data.url;
-				title = data.title || null;
-				source = source; // Set the source here
-				setStoredData({
-					url: data.url,
-					title: data.title || '',
-					source: source
-				});
-				state = 'fetched';
+
+			// Handle the response based on the source
+			if (source === 'wikipedia') {
+				if (
+					data &&
+					data.content_urls &&
+					data.content_urls.desktop &&
+					data.content_urls.desktop.page
+				) {
+					url = data.content_urls.desktop.page; // Get the URL from the response
+					title = data.title || null;
+					setStoredData({
+						url: url,
+						title: title || '',
+						source: 'wikipedia'
+					});
+					state = 'fetched';
+				} else {
+					throw new Error(`No valid URL found in the Wikipedia response`);
+				}
 			} else {
-				throw new Error(`No valid URL found in the ${source} response`);
+				if (data.url) {
+					url = data.url;
+					title = data.title || null;
+					setStoredData({
+						url: data.url,
+						title: data.title || '',
+						source: source
+					});
+					state = 'fetched';
+				} else {
+					throw new Error(`No valid URL found in the ${source} response`);
+				}
 			}
 		} catch (err) {
 			error = `Error fetching from ${source}: ${err.message}`;
@@ -126,15 +157,19 @@
 		} else if (event.key === 'h' || event.key === 'H') {
 			pulse('indigo');
 			fetchRandomPost('hackernews');
+		} else if (event.key === 'w' || event.key === 'W') {
+			pulse('indigo');
+			fetchRandomPost('wikipedia');
 		} else if (event.key === 'v' || event.key === 'V') {
 			if (url) window.open(url, '_blank');
 			pulse('emerald');
 		} else if (event.key === 'n' || event.key === 'N') {
 			pulse('rose');
 			state = 'idle';
+			source = null; // Reset the source
 		} else if (event.key === 'e' || event.key === 'E') {
 			pulse('indigo');
-			fetchRandomPost(source || 'reddit');
+			fetchRandomPost(source === 'wikipedia' ? 'wikipedia' : 'reddit');
 		}
 	}
 
@@ -182,8 +217,19 @@
 			on:click={toggleSidebar}
 			class="absolute top-4 right-4 z-10 text-gray-400 hover:text-white transition-colors duration-300"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-6 w-6"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M4 6h16M4 12h16M4 18h16"
+				/>
 			</svg>
 		</button>
 		<div class="w-full max-w-2xl mx-auto">
@@ -210,7 +256,7 @@
 						class="big-button bg-red-600 hover:bg-red-700"
 						style="transform: scale({$buttonScale})"
 					>
-						Reddit Surprise <kbd class="ml-2 px-2 py-1 text-sm bg-red-700 rounded">R</kbd>
+						Reddit <kbd class="ml-2 px-2 py-1 text-sm bg-red-700 rounded">R</kbd>
 					</button>
 					<button
 						on:click={() => {
@@ -220,7 +266,17 @@
 						class="big-button bg-orange-600 hover:bg-orange-700"
 						style="transform: scale({$buttonScale})"
 					>
-						HN Surprise <kbd class="ml-2 px-2 py-1 text-sm bg-orange-700 rounded">H</kbd>
+						HN <kbd class="ml-2 px-2 py-1 text-sm bg-orange-700 rounded">H</kbd>
+					</button>
+					<button
+						on:click={() => {
+							pulse('indigo');
+							fetchRandomPost('wikipedia');
+						}}
+						class="big-button bg-blue-600 hover:bg-blue-700"
+						style="transform: scale({$buttonScale})"
+					>
+						Wikipedia <kbd class="ml-2 px-2 py-1 text-sm bg-blue-700 rounded">W</kbd>
 					</button>
 				</div>
 			{:else if state === 'loading'}
@@ -240,7 +296,9 @@
 						<p class="text-lg text-gray-400 mb-2">{title}</p>
 						<a href={url} class="text-blue-400 hover:text-blue-300 break-all mb-6 block">{url}</a>
 					{/if}
-					<div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
+					<div
+						class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-6"
+					>
 						<a
 							href={url}
 							target="_blank"
@@ -248,27 +306,33 @@
 							style="transform: scale({$buttonScale})"
 							on:click={() => pulse('emerald')}
 						>
-							Visit Site <kbd class="ml-2 px-2 py-1 text-sm bg-emerald-700 rounded shadow-inner">V</kbd>
+							Visit Site <kbd class="ml-2 px-2 py-1 text-sm bg-emerald-700 rounded shadow-inner"
+								>V</kbd
+							>
 						</a>
 						<button
 							on:click={() => {
 								pulse('indigo');
-								fetchRandomPost(source || 'reddit');
+								fetchRandomPost(source); // Fetch from the current source
 							}}
 							class="big-button bg-indigo-600 hover:bg-indigo-700 text-gray-200 transform transition-all duration-300 hover:scale-105 hover:-rotate-1"
 							style="transform: scale({$buttonScale})"
 						>
-							Next Link <kbd class="ml-2 px-2 py-1 text-sm bg-indigo-700 rounded shadow-inner">E</kbd>
+							Next Link <kbd class="ml-2 px-2 py-1 text-sm bg-indigo-700 rounded shadow-inner"
+								>E</kbd
+							>
 						</button>
 						<button
 							on:click={() => {
 								pulse('rose');
 								state = 'idle';
+								source = null; // Reset the source
 							}}
 							class="big-button bg-rose-600 hover:bg-rose-700 text-gray-200 transform transition-all duration-300 hover:scale-105 hover:rotate-1"
 							style="transform: scale({$buttonScale})"
 						>
-							Start Over <kbd class="ml-2 px-2 py-1 text-sm bg-rose-700 rounded shadow-inner">N</kbd>
+							Start Over <kbd class="ml-2 px-2 py-1 text-sm bg-rose-700 rounded shadow-inner">N</kbd
+							>
 						</button>
 					</div>
 				</div>
@@ -293,7 +357,11 @@
 								in:fly={{ y: 20, duration: 300, delay: i * 50 }}
 							>
 								<p class="text-sm text-gray-500 mb-2">
-									{item.source === 'reddit' ? 'Reddit' : 'Hacker News'}
+									{item.source === 'reddit'
+										? 'Reddit'
+										: item.source === 'hackernews'
+											? 'Hacker News'
+											: 'Wikipedia'}
 								</p>
 								<p class="text-blue-400 hover:text-blue-300 break-all">{item.title || item.url}</p>
 							</a>
@@ -321,88 +389,114 @@
 </div>
 
 <div
-    class="fixed right-0 top-0 h-full w-64 bg-gray-950 p-6 overflow-y-auto transition-transform duration-300 ease-in-out transform {isSidebarOpen ? 'translate-x-0' : 'translate-x-full'} z-50"
+	class="fixed right-0 top-0 h-full w-64 bg-gray-950 p-6 overflow-y-auto transition-transform duration-300 ease-in-out transform {isSidebarOpen
+		? 'translate-x-0'
+		: 'translate-x-full'} z-50"
 >
-    <button
-        on:click={toggleSidebar}
-        class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-300"
-    >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    </button>
-    <h2 class="text-2xl font-semibold mb-6 text-gray-300 gradient-text">Subreddit Preferences</h2>
-    <div class="flex items-center mb-4">
-        <input
-            type="checkbox"
-            id="selectAll"
-            checked={preferences.every(pref => pref.enabled)}
-            on:change={(e) => toggleAllPreferences(e.target.checked)}
-            class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
-        />
-        <label for="selectAll" class="ml-2 text-gray-300 hover:text-white transition-colors duration-300">Select All</label>
-    </div>
-    {#each preferences as pref}
-        <div class="flex items-center mb-4">
-            <input
-                type="checkbox"
-                id={pref.name}
-                bind:checked={pref.enabled}
-                on:change={savePreferences}
-                class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
-            />
-            <label for={pref.name} class="ml-2 text-gray-300 hover:text-white transition-colors duration-300">{pref.name}</label>
-        </div>
-    {/each}
+	<button
+		on:click={toggleSidebar}
+		class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-300"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="h-6 w-6"
+			fill="none"
+			viewBox="0 0 24 24"
+			stroke="currentColor"
+		>
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M6 18L18 6M6 6l12 12"
+			/>
+		</svg>
+	</button>
+	<h2 class="text-2xl font-semibold mb-6 text-gray-300 gradient-text">Subreddit Preferences</h2>
+	<div class="flex items-center mb-4">
+		<input
+			type="checkbox"
+			id="selectAll"
+			checked={preferences.every((pref) => pref.enabled)}
+			on:change={(e) => toggleAllPreferences(e.target.checked)}
+			class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+		/>
+		<label
+			for="selectAll"
+			class="ml-2 text-gray-300 hover:text-white transition-colors duration-300">Select All</label
+		>
+	</div>
+	{#each preferences as pref}
+		<div class="flex items-center mb-4">
+			<input
+				type="checkbox"
+				id={pref.name}
+				bind:checked={pref.enabled}
+				on:change={savePreferences}
+				class="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+			/>
+			<label
+				for={pref.name}
+				class="ml-2 text-gray-300 hover:text-white transition-colors duration-300"
+				>{pref.name}</label
+			>
+		</div>
+	{/each}
 </div>
 
 <style>
-    :global(body) {
-        @apply bg-black text-gray-300 font-sans overflow-x-hidden;
-    }
+	:global(body) {
+		@apply bg-black text-gray-300 font-sans overflow-x-hidden;
+	}
 
-    .big-button {
-        @apply px-8 py-4 rounded-full text-lg font-medium text-white transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-50 shadow-lg;
-    }
+	.big-button {
+		@apply px-8 py-4 rounded-full text-lg font-medium text-white transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-50 shadow-lg;
+	}
 
-    .loader {
-        @apply w-12 h-12 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mx-auto;
-    }
+	.loader {
+		@apply w-12 h-12 border-4 border-gray-700 border-t-blue-500 rounded-full animate-spin mx-auto;
+	}
 
-    .gradient-text {
-        background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        animation: gradient 10s ease infinite;
-        background-size: 300% 300%;
-    }
+	.gradient-text {
+		background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		animation: gradient 10s ease infinite;
+		background-size: 300% 300%;
+	}
 
-    @keyframes gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+	@keyframes gradient {
+		0% {
+			background-position: 0% 50%;
+		}
+		50% {
+			background-position: 100% 50%;
+		}
+		100% {
+			background-position: 0% 50%;
+		}
+	}
 
-    .big-button {
-        position: relative;
-        overflow: hidden;
-    }
+	.big-button {
+		position: relative;
+		overflow: hidden;
+	}
 
-    .big-button::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 300%;
-        height: 300%;
-        background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
-        transform: translate(-50%, -50%) scale(0);
-        transition: transform 0.5s ease-out;
-    }
+	.big-button::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 300%;
+		height: 300%;
+		background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+		transform: translate(-50%, -50%) scale(0);
+		transition: transform 0.5s ease-out;
+	}
 
-    .big-button:active::after {
-        transform: translate(-50%, -50%) scale(1);
-        transition: transform 0s;
-    }
+	.big-button:active::after {
+		transform: translate(-50%, -50%) scale(1);
+		transition: transform 0s;
+	}
 </style>
