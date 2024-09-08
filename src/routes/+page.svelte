@@ -27,7 +27,6 @@
 		{ name: 'gadgets', enabled: true },
 		{ name: 'listentothis', enabled: true },
 		{ name: 'DepthHub', enabled: true },
-		{ name: 'AskHistorians', enabled: true }
 	];
 
 	let isSidebarOpen = false;
