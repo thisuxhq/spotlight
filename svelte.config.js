@@ -23,7 +23,7 @@ const config = {
 				experimentalJsonConfig: false,
 				persist: false
 			}
-		}),
+		})
 	}
 };
 

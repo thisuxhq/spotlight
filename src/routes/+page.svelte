@@ -27,6 +27,38 @@
 		{ name: 'gadgets', enabled: true },
 		{ name: 'listentothis', enabled: true },
 		{ name: 'DepthHub', enabled: true },
+		{
+			name: 'philosophy',
+			enabled: true
+		},
+		{
+			name: 'news',
+			enabled: true
+		},
+		{
+			name: 'Futurology',
+			enabled: true
+		},
+		{
+			name: 'History',
+			enabled: true
+		},
+		{
+			name: 'bestof',
+			enabled: true
+		},
+		{
+			name: 'truereddit',
+			enabled: true
+		},
+		{
+			name: 'Environment',
+			enabled: true
+		},
+		{
+			name: 'Foodforthought',
+			enabled: true
+		}
 	];
 
 	let isSidebarOpen = false;
@@ -457,7 +489,17 @@
 	}
 
 	.gradient-text {
-		background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+		background: linear-gradient(
+			45deg,
+			#ff6b6b,
+			#feca57,
+			#48dbfb,
+			#ff9ff3,
+			#ff6b6b,
+			#feca57,
+			#48dbfb,
+			#ff9ff3
+		);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
